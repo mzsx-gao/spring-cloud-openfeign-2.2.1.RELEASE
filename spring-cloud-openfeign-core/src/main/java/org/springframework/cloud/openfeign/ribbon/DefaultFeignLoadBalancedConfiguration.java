@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 class DefaultFeignLoadBalancedConfiguration {
 
+    //自动注入LoadBalancerFeignClient
 	@Bean
 	@ConditionalOnMissingBean
 	public Client feignClient(CachingSpringLoadBalancerFactory cachingFactory,

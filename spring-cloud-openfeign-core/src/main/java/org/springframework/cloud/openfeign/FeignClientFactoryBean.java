@@ -101,23 +101,16 @@ class FeignClientFactoryBean
 	}
 
 	protected void configureFeign(FeignContext context, Feign.Builder builder) {
-		FeignClientProperties properties = this.applicationContext
-				.getBean(FeignClientProperties.class);
+		FeignClientProperties properties = this.applicationContext.getBean(FeignClientProperties.class);
 		if (properties != null) {
 			if (properties.isDefaultToProperties()) {
 				configureUsingConfiguration(context, builder);
-				configureUsingProperties(
-						properties.getConfig().get(properties.getDefaultConfig()),
-						builder);
-				configureUsingProperties(properties.getConfig().get(this.contextId),
-						builder);
+				configureUsingProperties(properties.getConfig().get(properties.getDefaultConfig()), builder);
+				configureUsingProperties(properties.getConfig().get(this.contextId), builder);
 			}
 			else {
-				configureUsingProperties(
-						properties.getConfig().get(properties.getDefaultConfig()),
-						builder);
-				configureUsingProperties(properties.getConfig().get(this.contextId),
-						builder);
+				configureUsingProperties(properties.getConfig().get(properties.getDefaultConfig()), builder);
+				configureUsingProperties(properties.getConfig().get(this.contextId), builder);
 				configureUsingConfiguration(context, builder);
 			}
 		}
@@ -126,8 +119,7 @@ class FeignClientFactoryBean
 		}
 	}
 
-	protected void configureUsingConfiguration(FeignContext context,
-			Feign.Builder builder) {
+	protected void configureUsingConfiguration(FeignContext context, Feign.Builder builder) {
 		Logger.Level level = getOptional(context, Logger.Level.class);
 		if (level != null) {
 			builder.logLevel(level);
@@ -144,8 +136,7 @@ class FeignClientFactoryBean
 		if (options != null) {
 			builder.options(options);
 		}
-		Map<String, RequestInterceptor> requestInterceptors = context
-				.getInstances(this.contextId, RequestInterceptor.class);
+		Map<String, RequestInterceptor> requestInterceptors = context.getInstances(this.contextId, RequestInterceptor.class);
 		if (requestInterceptors != null) {
 			builder.requestInterceptors(requestInterceptors.values());
 		}
@@ -234,8 +225,7 @@ class FeignClientFactoryBean
 		return context.getInstance(this.contextId, type);
 	}
 
-	protected <T> T loadBalance(Feign.Builder builder, FeignContext context,
-			HardCodedTarget<T> target) {
+	protected <T> T loadBalance(Feign.Builder builder, FeignContext context, HardCodedTarget<T> target) {
 		Client client = getOptional(context, Client.class);
 		if (client != null) {
 			builder.client(client);
@@ -269,8 +259,8 @@ class FeignClientFactoryBean
 				this.url = this.name;
 			}
 			this.url += cleanPath();
-			return (T) loadBalance(builder, context,
-					new HardCodedTarget<>(this.type, this.name, this.url));
+			//如果FeignClient没有地址url属性，用jdk动态代理生成代理
+			return (T) loadBalance(builder, context, new HardCodedTarget<>(this.type, this.name, this.url));
 		}
 		if (StringUtils.hasText(this.url) && !this.url.startsWith("http")) {
 			this.url = "http://" + this.url;
